@@ -13,5 +13,6 @@ export interface ASTConfig {
     style?: object;
     directives?: object;
     bind?: object;
+    _DForData?: any;
 }
 export declare function createLayout(this: View, node: ASTNode, modal: any): HTMLElement;

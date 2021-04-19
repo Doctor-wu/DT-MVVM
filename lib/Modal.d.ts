@@ -6,6 +6,7 @@ export declare class Modal<T = object> {
     depsId: number[];
     constructor(options: T);
     initModal(options: T): void;
+    reactive(obj: any): {};
     collectView(view: any): void;
     getModal(): any;
     _f(...args: any[]): any[];

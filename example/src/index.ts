@@ -5,12 +5,15 @@ const baseView = new View();
 const baseModal = new Modal({
     books: [
         {
-            name: 'JavaScript'
+            name: 'JavaScript',
+            color: 'yellow'
         },
         {
-            name: 'Typescript'
+            name: 'Typescript',
+            color: 'blue'
         }
     ],
+    obj:{},
     myName: 'Doctorwu',
     guest: 'Yoki',
     date: formatTime(new Date(Date.now()+8*3600000).toISOString()+8*3600000)

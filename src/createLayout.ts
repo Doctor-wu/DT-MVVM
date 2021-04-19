@@ -16,6 +16,7 @@ export interface ASTConfig {
     style?: object;
     directives?: object;
     bind?: object;
+    _DForData?: any;
 }
 
 export function createLayout(this: View, node: ASTNode, modal): HTMLElement {
@@ -33,7 +34,6 @@ export function createLayout(this: View, node: ASTNode, modal): HTMLElement {
     View.Target = undefined;
     console.log(ast);
     const dom = genHTML.call(this, ast);
-    console.dir(dom.childNodes[0]);
     return <HTMLElement>dom.childNodes[0];
 }
 
@@ -74,7 +74,6 @@ function genCode(this: View, nodes: ASTNode[]) {
     let content = "";
     nodes.forEach(node => {
         if (node.type === NODE_TYPE.Element) {
-            this.resolveDirectives(node?.config?.directives, content);
             content += `_e("${node.tagName}",${node.config ? `_a(${JSON.stringify(node.config)})` : null},${node.children ? genCode.call(this, node.children) : null}),`;
         }
         if (node.type === NODE_TYPE.Text) {

@@ -116,7 +116,7 @@ export class View {
                         },
                         {
                             type: NODE_TYPE.Text,
-                            content: " {%myName%}"
+                            content: " {%myName%} {%obj?.a?.c%}"
                         },
                     ]
                 },
@@ -126,19 +126,5 @@ export class View {
 
     bindModal(modal: _Modal) {
         this.$modal = modal;
-    }
-
-    resolveDirectives(directives, renderStr:string){
-        if(!directives) return;
-        console.log(renderStr)
-        Object.keys(directives).forEach(key=>{
-            const resolver = this[`d_${key}`];
-            if(resolver == undefined) return;
-            resolver.call(this, directives[key])
-        })
-    }
-
-    d_for(options){
-        console.log(options)
     }
 }
