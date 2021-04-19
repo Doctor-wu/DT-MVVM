@@ -1,22 +1,29 @@
 import {NODE_TYPE} from "./constant";
 import {primitiveValue} from "./common/types";
 import {View} from "./index";
+import {Modal} from "./Modal";
 
-export interface VNode {
+export interface ASTNode {
     type: typeof NODE_TYPE[keyof typeof NODE_TYPE];
     tagName?: string;
-    attrs?: object | null;
-    children?: VNode[];
-    bind?: {};
+    config?: ASTConfig;
+    children?: ASTNode[];
     content?: Omit<primitiveValue, 'Symbol'>;
+    $parent?: any;
 }
 
-export function createLayout(this: View, node: VNode, modal): HTMLElement {
-    const code = genCode([node]);
+export interface ASTConfig {
+    style?: object;
+    directives?: object;
+    bind?: object;
+}
+
+export function createLayout(this: View, node: ASTNode, modal): HTMLElement {
+    const code = genCode.call(this,[node]);
     console.log(modal);
     const render = new Function('modal', `with(modal){return ${code}}`);
     this.$update = () => {
-        const dom = genHTML(render(modal)).childNodes[0];
+        const dom = genHTML.call(this, render(modal)).childNodes[0];
         this.$el?.parentNode?.replaceChild(dom, this.$el);
         this.$el = <HTMLElement>dom;
     }
@@ -25,23 +32,33 @@ export function createLayout(this: View, node: VNode, modal): HTMLElement {
     const ast = render(modal);
     View.Target = undefined;
     console.log(ast);
-    const dom = genHTML(ast);
+    const dom = genHTML.call(this, ast);
     console.dir(dom.childNodes[0]);
     return <HTMLElement>dom.childNodes[0];
 }
 
 
-function genHTML(ast): DocumentFragment {
+function resolveStyle(dom, style: object = {}) {
+    Object.keys(style || {}).forEach(key => {
+        dom.style[key] = style[key];
+    });
+}
+
+function resolveBind(dom, bind: object = {}, modal: Modal) {
+    Object.keys(bind || {}).forEach(key => {
+        dom[key] = modal.parseModal(bind[key]);
+    });
+}
+
+
+function genHTML(this: View, VNodes): DocumentFragment {
     const fragment = document.createDocumentFragment();
-    ast.forEach(node => {
+    VNodes.forEach(node => {
         if (node.type === "element") {
             const dom = document.createElement(node.tagName);
-            Object.assign(dom, node.attrs || {});
-            const {style} = node.attrs || {};
-            Object.keys(style || {}).forEach(key => {
-                dom.style[key] = node.attrs.style[key];
-            });
-            if (node.children) dom.appendChild(genHTML(node.children));
+            resolveBind(dom, node?.config?.bind, this.$modal);
+            resolveStyle(dom, node?.config?.style);
+            if (node.children) dom.appendChild(genHTML.call(this, node.children));
             fragment.append(dom);
         }
         if (node.type === 'text') {
@@ -53,11 +70,12 @@ function genHTML(ast): DocumentFragment {
 }
 
 
-function genCode(nodes: VNode[]) {
+function genCode(this: View, nodes: ASTNode[]) {
     let content = "";
     nodes.forEach(node => {
         if (node.type === NODE_TYPE.Element) {
-            content += `_e("${node.tagName}",_a(${JSON.stringify(node.attrs)}),${node.children ? genCode(node.children) : null}),`;
+            this.resolveDirectives(node?.config?.directives, content);
+            content += `_e("${node.tagName}",${node.config ? `_a(${JSON.stringify(node.config)})` : null},${node.children ? genCode.call(this, node.children) : null}),`;
         }
         if (node.type === NODE_TYPE.Text) {
             content += `_t("${node.content}"),`;

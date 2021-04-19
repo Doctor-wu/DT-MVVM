@@ -1,8 +1,7 @@
-import {primitiveValue} from "../lib/common/types";
-import {isPrimitiveValue} from "./utils/util";
 import {View} from "./index";
+import {ASTConfig, ASTNode} from "./createLayout";
 
-export default class Modal<T = object | primitiveValue> {
+export class Modal<T = object> {
     private _modal: any;
     public deps: Set<View>;
     public depsId: number[];
@@ -15,28 +14,11 @@ export default class Modal<T = object | primitiveValue> {
 
     initModal(options: T) {
         const that = this;
-        if (isPrimitiveValue(options)) this._modal = new Proxy({}, {
-            get(_, p: string | symbol): T | undefined {
-                // console.log('get', p);
-                if (View.Target) {
-                    that.collectView(View.Target)
-                }
-                if (p === 'default') return options;
-            },
-            set(target, p, value) {
-                if (p !== 'default') return false;
-                Reflect.set(target, 'default', value);
-                that.deps.forEach(dep => {
-                    dep.$update();
-                });
-                return true;
-            }
-        })
-        else this._modal = new Proxy(<object><unknown>options, {
+        this._modal = new Proxy(<object><unknown>options, {
             get(target: {}, p: string | symbol, receiver: any): any {
                 // console.log('get', p);
                 if (View.Target) {
-                    that.collectView(View.Target)
+                    that.collectView(View.Target);
                 }
                 return Reflect.get(target, p, receiver);
             },
@@ -58,36 +40,62 @@ export default class Modal<T = object | primitiveValue> {
         return this._modal;
     }
 
+    // 解析多个子元素
     _f(...args) {
         return args;
     }
 
+    //解析Text
     _t(str) {
-        str = str.replace(/\{%([^%}]+)%\}/g, (...args) => {
-            return this._modal[args[1]];
-        });
+        // eslint-disable-next-line no-unused-vars
+        str = this.parseModal(str);
         return {
             type: 'text',
             content: str
         };
     }
 
-    _e(eName, attrs, children) {
-        return {
+    // 解析Element
+    _e(eName, config: ASTConfig, children?: ASTNode[]) {
+        this.resolveDirectives(config?.directives, config, children)
+        const element = {
             tagName: eName,
             type: 'element',
-            attrs,
+            config,
             children
         };
+        children?.forEach(child=>{
+            child.$parent = element;
+        })
+        return element;
     }
 
+    // 解析Attr
     _a(attr) {
         if (!attr) return;
         Object.keys(attr.bind = attr.bind || {}).forEach(key => {
-            attr[key] = attr.bind[key].replace(/\{%([^%}]+)%\}/g, (...args) => {
-                return this._modal[args[1]];
-            });
+            attr[key] = this.parseModal(attr.bind[key]);
         })
         return attr;
+    }
+
+    resolveDirectives(directives, config: ASTConfig, children?: ASTNode[]) {
+        if (!directives) return;
+        Object.keys(directives).forEach(key => {
+            const resolver = this[`d_${key}`];
+            if (resolver == undefined) return;
+            resolver.call(this, directives[key], config, children)
+        })
+    }
+
+    d_for(options, config: ASTConfig, children?: ASTNode[]) {
+        console.log(options, config, children)
+    }
+
+    parseModal(str: string) {
+        return str.replace(/\{%([^%}]+)%\}/g, (...args) => {
+            const withFunc = new Function('modal', 'expr', 'with(modal){return eval(expr)}');
+            return withFunc(this._modal, args[1]);
+        });
     }
 }

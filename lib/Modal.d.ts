@@ -1,6 +1,6 @@
-import { primitiveValue } from "../lib/common/types";
 import { View } from "./index";
-export default class Modal<T = object | primitiveValue> {
+import { ASTConfig, ASTNode } from "./createLayout";
+export declare class Modal<T = object> {
     private _modal;
     deps: Set<View>;
     depsId: number[];
@@ -13,11 +13,14 @@ export default class Modal<T = object | primitiveValue> {
         type: string;
         content: any;
     };
-    _e(eName: any, attrs: any, children: any): {
+    _e(eName: any, config: ASTConfig, children?: ASTNode[]): {
         tagName: any;
         type: string;
-        attrs: any;
-        children: any;
+        config: ASTConfig;
+        children: ASTNode[] | undefined;
     };
     _a(attr: any): any;
+    resolveDirectives(directives: any, config: ASTConfig, children?: ASTNode[]): void;
+    d_for(options: any, config: ASTConfig, children?: ASTNode[]): void;
+    parseModal(str: string): string;
 }

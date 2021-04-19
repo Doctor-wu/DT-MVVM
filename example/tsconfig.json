@@ -15,7 +15,7 @@
     "declarationDir": "./dist/types/",
     // 是否生成声明文件map文件（便于调试）
     "moduleResolution": "node",
-    "module": "esnext",
+    "module": "ESNext",
     "target": "es5",
     // 转化成的目标语言
     "baseUrl": "./",

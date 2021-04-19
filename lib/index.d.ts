@@ -1,13 +1,19 @@
-import { VNode } from "./createLayout";
-import Modal from "./Modal";
+import { ASTNode } from "./createLayout";
+import type { Modal as _Modal } from "./Modal";
+import { primitiveValue } from "./common/types";
+export declare const Modal: any;
 export declare class View {
     rootElement: HTMLElement | null;
     $el: HTMLElement;
-    $modal: Modal;
+    $modal: _Modal;
+    modalSet: Set<_Modal>;
     $update: Function;
     vid: number;
     static Target: View | undefined;
     constructor();
-    render(modal: Modal, container: HTMLElement | string): void;
-    layout(): VNode;
+    render(modal: _Modal | primitiveValue, container: HTMLElement | string): void;
+    getLayout(): ASTNode;
+    bindModal(modal: _Modal): void;
+    resolveDirectives(directives: any, renderStr: string): void;
+    d_for(options: any): void;
 }
