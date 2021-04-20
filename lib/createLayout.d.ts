@@ -16,3 +16,4 @@ export interface ASTConfig {
     _DForData?: any;
 }
 export declare function createLayout(this: View, node: ASTNode, modal: any): HTMLElement;
+export declare function genCode(this: View, nodes: ASTNode[]): string;

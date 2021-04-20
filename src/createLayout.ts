@@ -20,7 +20,7 @@ export interface ASTConfig {
 }
 
 export function createLayout(this: View, node: ASTNode, modal): HTMLElement {
-    const code = genCode.call(this,[node]);
+    const code = genCode.call(this, [node]);
     console.log(modal);
     const render = new Function('modal', `with(modal){return ${code}}`);
     this.$update = () => {
@@ -54,15 +54,31 @@ function resolveBind(dom, bind: object = {}, modal: Modal) {
 function genHTML(this: View, VNodes): DocumentFragment {
     const fragment = document.createDocumentFragment();
     VNodes.forEach(node => {
-        if (node.type === "element") {
-            const dom = document.createElement(node.tagName);
-            resolveBind(dom, node?.config?.bind, this.$modal);
-            resolveStyle(dom, node?.config?.style);
-            if (node.children) dom.appendChild(genHTML.call(this, node.children));
-            fragment.append(dom);
-        }
-        if (node.type === 'text') {
-            fragment.append(document.createTextNode(node.content));
+        console.log(node)
+        if (Array.isArray(node)) {
+            node.forEach(child => {
+                if (child.type === "element") {
+                    const dom = document.createElement(child.tagName);
+                    resolveBind(dom, child?.config?.bind, this.$modal);
+                    resolveStyle(dom, child?.config?.style);
+                    if (child.children) dom.appendChild(genHTML.call(this, child.children));
+                    fragment.append(dom);
+                }
+                if (child.type === 'text') {
+                    fragment.append(document.createTextNode(child.content));
+                }
+            })
+        } else {
+            if (node.type === "element") {
+                const dom = document.createElement(node.tagName);
+                resolveBind(dom, node?.config?.bind, this.$modal);
+                resolveStyle(dom, node?.config?.style);
+                if (node.children) dom.appendChild(genHTML.call(this, node.children));
+                fragment.append(dom);
+            }
+            if (node.type === 'text') {
+                fragment.append(document.createTextNode(node.content));
+            }
         }
     });
 
@@ -70,10 +86,15 @@ function genHTML(this: View, VNodes): DocumentFragment {
 }
 
 
-function genCode(this: View, nodes: ASTNode[]) {
+export function genCode(this: View, nodes: ASTNode[]) {
     let content = "";
     nodes.forEach(node => {
-        if(this.resolveDirectives(node)) return;
+        let dContent: string | undefined = "";
+        dContent = this.resolveDirectives(node)
+        if (dContent) {
+            content += dContent;
+            return;
+        }
         if (node.type === NODE_TYPE.Element) {
             content += `_e("${node.tagName}",${node.config ? `_a(${JSON.stringify(node.config)})` : null},${node.children ? genCode.call(this, node.children) : null}),`;
         }

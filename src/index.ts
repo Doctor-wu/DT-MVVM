@@ -1,6 +1,6 @@
-import {getDOM, isPrimitiveValue} from "./utils/util";
+import {deepClone, getDOM, isPrimitiveValue} from "./utils/util";
 import {NODE_TYPE} from "./constant";
-import {ASTNode, createLayout} from "./createLayout";
+import {ASTNode, createLayout, genCode} from "./createLayout";
 import type {Modal as _Modal} from "./Modal";
 import {primitiveValue} from "./common/types";
 
@@ -68,10 +68,10 @@ export class View {
                                         expr: 'books',
                                         alias: 'item'
                                     },
-                                    bind: {
-                                        expr: 'style',
-                                        value: "{%item.name%}"
-                                    }
+                                    // bind: {
+                                    //     expr: 'style',
+                                    //     value: "{%item.name%}"
+                                    // }
                                 }
                             },
                         }
@@ -141,11 +141,16 @@ export class View {
             const resolver = this[`d_${key}`];
             if (resolver == undefined) return;
             content = resolver.call(this, node, content)
-        })
+        });
+        return content;
     }
 
     d_for(node: ASTNode):string {
-        console.log(node)
-        return "";
+        const {
+            directives: {for: config },
+        } = <any>node.config!;
+        const nConfig = deepClone(node.config!);
+        delete (nConfig.directives as any).for;
+        return `_l("${config.expr}", function(${config.alias}){return _e("${node.tagName}", _a(${JSON.stringify(nConfig)}), ${node.children ? genCode.call(this, node.children) : null})})`;
     }
 }

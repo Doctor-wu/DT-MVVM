@@ -3,7 +3,6 @@ import { ASTConfig, ASTNode } from "./createLayout";
 export declare class Modal<T = object> {
     private _modal;
     deps: Set<View>;
-    depsId: number[];
     constructor(options: T);
     initModal(options: T): void;
     reactive(obj: any): {};
@@ -20,6 +19,7 @@ export declare class Modal<T = object> {
         config: ASTConfig;
         children: ASTNode[] | undefined;
     };
+    _l(expr: any, func: any): any[];
     _a(attr: any): any;
     parseModal(str: string): string;
 }

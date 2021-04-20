@@ -8,11 +8,9 @@ const proxied = Symbol('proxied');
 export class Modal<T = object> {
     private _modal: any;
     public deps: Set<View>;
-    public depsId: number[];
 
     constructor(options: T) {
         this.deps = new Set;
-        this.depsId = [];
         this.initModal(options);
     }
 
@@ -22,7 +20,7 @@ export class Modal<T = object> {
 
     reactive(obj) {
         const that = this;
-        console.log(pid++)
+        obj._pid = pid++;
         return new Proxy(<object><unknown>obj, {
             get(target: {}, p: string | symbol, receiver: any): any {
                 // console.log('get', p);
@@ -82,10 +80,20 @@ export class Modal<T = object> {
             config,
             children
         };
-        children?.forEach(child => {
-            child.$parent = element;
-        })
+        console.log(element, children)
         return element;
+    }
+
+    // 解析for指令
+    _l(expr, func){
+        console.log(expr, func);
+        const list:any[] = eval(`this._modal.${expr}`);
+        const elements:any[] = [];
+        list.forEach(item=>{
+            new Function('item', 'return func(item)');
+            elements.push(func(item));
+        });
+        return elements;
     }
 
     // 解析Attr
@@ -99,7 +107,11 @@ export class Modal<T = object> {
 
     parseModal(str: string) {
         return str.replace(/\{%([^%}]+)%\}/g, (...args) => {
-            const withFunc = new Function('modal', 'expr', 'with(modal){return eval(expr)}');
+            const withFunc = new Function('modal', 'expr',
+                `
+                console.log(expr)
+                with(modal){return eval(expr)}
+            `);
             return withFunc(this._modal, args[1]);
         });
     }
