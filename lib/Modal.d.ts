@@ -8,6 +8,7 @@ export declare class Modal<T = object> {
     reactive(obj: any): {};
     collectView(view: any): void;
     getModal(): any;
+    resolveDirectives(attr: ASTConfig): void;
     _f(...args: any[]): any[];
     _t(str: any): {
         type: string;
@@ -21,5 +22,8 @@ export declare class Modal<T = object> {
     };
     _l(expr: any, func: any): any[];
     _a(attr: any): any;
+    _s(expr: any): any;
+    d_bind(attr: ASTConfig): void;
     parseModal(str: string): string;
 }
+export declare function omitWrap(str: any): any;

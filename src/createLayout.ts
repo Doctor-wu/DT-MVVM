@@ -1,7 +1,7 @@
 import {NODE_TYPE} from "./constant";
 import {primitiveValue} from "./common/types";
 import {View} from "./index";
-import {Modal} from "./Modal";
+import {Modal, omitWrap} from "./Modal";
 
 export interface ASTNode {
     type: typeof NODE_TYPE[keyof typeof NODE_TYPE];
@@ -54,12 +54,11 @@ function resolveBind(dom, bind: object = {}, modal: Modal) {
 function genHTML(this: View, VNodes): DocumentFragment {
     const fragment = document.createDocumentFragment();
     VNodes.forEach(node => {
-        console.log(node)
         if (Array.isArray(node)) {
             node.forEach(child => {
                 if (child.type === "element") {
                     const dom = document.createElement(child.tagName);
-                    resolveBind(dom, child?.config?.bind, this.$modal);
+                    // resolveBind(dom, child?.config?.bind, this.$modal);
                     resolveStyle(dom, child?.config?.style);
                     if (child.children) dom.appendChild(genHTML.call(this, child.children));
                     fragment.append(dom);
@@ -86,7 +85,7 @@ function genHTML(this: View, VNodes): DocumentFragment {
 }
 
 
-export function genCode(this: View, nodes: ASTNode[]) {
+export function genCode(this: View, nodes: ASTNode[], modal?:any) {
     let content = "";
     nodes.forEach(node => {
         let dContent: string | undefined = "";
@@ -99,8 +98,9 @@ export function genCode(this: View, nodes: ASTNode[]) {
             content += `_e("${node.tagName}",${node.config ? `_a(${JSON.stringify(node.config)})` : null},${node.children ? genCode.call(this, node.children) : null}),`;
         }
         if (node.type === NODE_TYPE.Text) {
-            content += `_t("${node.content}"),`;
+            content += `_t("${omitWrap(node.content)}"${modal ? `,"${modal}"` : ""}),`;
         }
     })
     return `_f(${content})`;
 }
+

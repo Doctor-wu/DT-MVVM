@@ -5,6 +5,7 @@ import {isPrimitiveValue} from "./utils/util";
 let readLocking = false;
 let pid = 0;
 const proxied = Symbol('proxied');
+
 export class Modal<T = object> {
     private _modal: any;
     public deps: Set<View>;
@@ -24,9 +25,9 @@ export class Modal<T = object> {
         return new Proxy(<object><unknown>obj, {
             get(target: {}, p: string | symbol, receiver: any): any {
                 // console.log('get', p);
-                if(p === proxied) return true;
+                if (p === proxied) return true;
                 let value = Reflect.get(target, p, receiver);
-                if(!isPrimitiveValue(value) && !readLocking && !value[proxied]){
+                if (!isPrimitiveValue(value) && !readLocking && !value[proxied]) {
                     readLocking = true;
                     value = that.reactive(value);
                     Reflect.set(target, p, value);
@@ -39,7 +40,7 @@ export class Modal<T = object> {
             },
             set(target, p, value) {
                 // console.log('set', p);
-                if(!isPrimitiveValue(value) && !value[proxied]) value = that.reactive(value);
+                if (!isPrimitiveValue(value) && !value[proxied]) value = that.reactive(value);
                 Reflect.set(target, p, value);
                 that.deps.forEach(dep => {
                     dep.$update();
@@ -57,6 +58,16 @@ export class Modal<T = object> {
         return this._modal;
     }
 
+    resolveDirectives(attr: ASTConfig): void {
+        const directives = attr?.directives || null;
+        if (!directives) return undefined;
+        Object.keys(directives).forEach(key => {
+            const resolver = this[`d_${key}`];
+            if (resolver == undefined) return;
+            resolver.call(this, attr)
+        });
+    }
+
     // 解析多个子元素
     _f(...args) {
         return args;
@@ -64,8 +75,6 @@ export class Modal<T = object> {
 
     //解析Text
     _t(str) {
-        // eslint-disable-next-line no-unused-vars
-        str = this.parseModal(str);
         return {
             type: 'text',
             content: str
@@ -80,18 +89,15 @@ export class Modal<T = object> {
             config,
             children
         };
-        console.log(element, children)
         return element;
     }
 
     // 解析for指令
-    _l(expr, func){
-        console.log(expr, func);
-        const list:any[] = eval(`this._modal.${expr}`);
-        const elements:any[] = [];
-        list.forEach(item=>{
-            new Function('item', 'return func(item)');
-            elements.push(func(item));
+    _l(expr, func) {
+        const list: any[] = eval(`this._modal.${expr}`);
+        const elements: any[] = [];
+        list.forEach(item => {
+            elements.push(func.call(this, item));
         });
         return elements;
     }
@@ -99,20 +105,40 @@ export class Modal<T = object> {
     // 解析Attr
     _a(attr) {
         if (!attr) return;
+        this.resolveDirectives(attr);
         Object.keys(attr.bind = attr.bind || {}).forEach(key => {
             attr[key] = this.parseModal(attr.bind[key]);
         })
         return attr;
     }
 
+    // 解析表达式
+    _s(expr) {
+        return eval(`this.${expr} || this._modal?.${expr}`);
+    }
+
+    d_bind(attr: ASTConfig) {
+        const bind = (attr.directives as any).bind.expr;
+        let value = (attr.directives as any).bind.value;
+        (attr.directives as any).bind.value = this.parseModal(value);
+        const fn = new Function("attr", "with(this){return eval(`new Object(${attr.directives.bind.value})`)}");
+        attr[bind] = fn.call(this, attr);
+    }
+
     parseModal(str: string) {
+        if (!str) return "";
         return str.replace(/\{%([^%}]+)%\}/g, (...args) => {
-            const withFunc = new Function('modal', 'expr',
-                `
-                console.log(expr)
-                with(modal){return eval(expr)}
-            `);
-            return withFunc(this._modal, args[1]);
+            //@ts-ignore
+            const key = args[1];
+            return eval("`this._modal.${key}`")
         });
     }
+}
+
+
+export function omitWrap(str) {
+    if (!str) return "";
+    return str.replace(/\{%([^%}]+)%\}/g, (...args) => {
+        return `" + _s('${args[1]}') + "`;
+    });
 }

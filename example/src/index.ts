@@ -6,18 +6,17 @@ const baseModal = new Modal({
     books: [
         {
             name: 'JavaScript',
-            color: 'yellow'
+            color: 'gold'
         },
         {
             name: 'Typescript',
-            color: 'blue'
+            color: 'darkblue'
         }
     ],
     obj:{},
     myName: 'Doctorwu',
     guest: 'Yoki',
     date: formatTime(new Date(Date.now()+8*3600000).toISOString()+8*3600000),
-    item: {}
 });
 baseView.render(baseModal, '#app');
 

@@ -68,10 +68,10 @@ export class View {
                                         expr: 'books',
                                         alias: 'item'
                                     },
-                                    // bind: {
-                                    //     expr: 'style',
-                                    //     value: "{%item.name%}"
-                                    // }
+                                    bind: {
+                                        expr: 'style',
+                                        value: "{color: item.color}"
+                                    }
                                 }
                             },
                         }
@@ -90,6 +90,7 @@ export class View {
                             tagName: 'input',
                             config: {
                                 bind: {
+                                    expr: 'value',
                                     value: "{%myName%}"
                                 }
                             }
@@ -119,7 +120,7 @@ export class View {
                         },
                         {
                             type: NODE_TYPE.Text,
-                            content: " {%myName%} {%obj?.a?.c%}"
+                            content: " {%myName%}"
                         },
                     ]
                 },
@@ -140,7 +141,7 @@ export class View {
         Object.keys(directives).forEach(key => {
             const resolver = this[`d_${key}`];
             if (resolver == undefined) return;
-            content = resolver.call(this, node, content)
+            content += resolver.call(this, node, content)
         });
         return content;
     }
@@ -151,6 +152,10 @@ export class View {
         } = <any>node.config!;
         const nConfig = deepClone(node.config!);
         delete (nConfig.directives as any).for;
-        return `_l("${config.expr}", function(${config.alias}){return _e("${node.tagName}", _a(${JSON.stringify(nConfig)}), ${node.children ? genCode.call(this, node.children) : null})})`;
+        return `_l("${config.expr}", function(${config.alias}){
+        this["${config.alias}"] = ${config.alias};
+        return _e("${node.tagName}", _a(${JSON.stringify(nConfig)}), ${node.children ? genCode.call(this, node.children) : null});
+        delete this["${config.expr}"];
+        }),`;
     }
 }
