@@ -3,6 +3,7 @@ import {ASTConfig, ASTNode} from "./createLayout";
 import {isPrimitiveValue} from "./utils/util";
 
 let readLocking = false;
+let pid = 0;
 const proxied = Symbol('proxied');
 export class Modal<T = object> {
     private _modal: any;
@@ -21,24 +22,26 @@ export class Modal<T = object> {
 
     reactive(obj) {
         const that = this;
+        console.log(pid++)
         return new Proxy(<object><unknown>obj, {
             get(target: {}, p: string | symbol, receiver: any): any {
                 // console.log('get', p);
                 if(p === proxied) return true;
-                const value = Reflect.get(target, p, receiver);
+                let value = Reflect.get(target, p, receiver);
                 if(!isPrimitiveValue(value) && !readLocking && !value[proxied]){
                     readLocking = true;
-                    Reflect.set(target, p, that.reactive(value));
+                    value = that.reactive(value);
+                    Reflect.set(target, p, value);
                     readLocking = false;
                 }
                 if (View.Target) {
                     that.collectView(View.Target);
                 }
-                return Reflect.get(target, p, receiver);
+                return value;
             },
             set(target, p, value) {
                 // console.log('set', p);
-                if(!isPrimitiveValue(value)) value = that.reactive(value);
+                if(!isPrimitiveValue(value) && !value[proxied]) value = that.reactive(value);
                 Reflect.set(target, p, value);
                 that.deps.forEach(dep => {
                     dep.$update();
