@@ -52,22 +52,37 @@ export class View {
                 {
                     type: NODE_TYPE.Element,
                     tagName: 'div',
+                    config: {
+                        directives: {
+                            for: {
+                                expr: 'books',
+                                alias: 'item',
+                                index: "index"
+                            },
+                        }
+                    },
                     children: [
                         {
                             type: NODE_TYPE.Element,
                             tagName: 'p',
                             children: [
                                 {
+                                    type: NODE_TYPE.Element,
+                                    tagName: 'h3',
+                                    children: [
+                                        {
+                                            type: NODE_TYPE.Text,
+                                            content: "{%item.name%} like me too {%index + 1%}",
+                                        },
+                                    ]
+                                },
+                                {
                                     type: NODE_TYPE.Text,
-                                    content: "I like read {%item.name%}",
-                                }
+                                    content: "I like read {%item.name%} {%index%}",
+                                },
                             ],
                             config: {
                                 directives: {
-                                    for: {
-                                        expr: 'books',
-                                        alias: 'item'
-                                    },
                                     bind: {
                                         expr: 'style',
                                         value: "{color: item.color}"
@@ -133,7 +148,6 @@ export class View {
     }
 
 
-
     resolveDirectives(node: ASTNode): string | undefined {
         const directives = node?.config?.directives || null;
         if (!directives) return undefined;
@@ -146,16 +160,18 @@ export class View {
         return content;
     }
 
-    d_for(node: ASTNode):string {
+    d_for(node: ASTNode): string {
         const {
-            directives: {for: config },
+            directives: {for: config},
         } = <any>node.config!;
         const nConfig = deepClone(node.config!);
         delete (nConfig.directives as any).for;
-        return `_l("${config.expr}", function(${config.alias}){
+        return `_l("${config.expr}", function(${config.alias}, ${config.index}){
         this["${config.alias}"] = ${config.alias};
+        ${config.index ? `this["${config.index}"] = ${config.index};` : ''}
         return _e("${node.tagName}", _a(${JSON.stringify(nConfig)}), ${node.children ? genCode.call(this, node.children) : null});
         delete this["${config.expr}"];
+        delete this["${config.index}"];
         }),`;
     }
 }

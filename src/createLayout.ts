@@ -1,7 +1,7 @@
 import {NODE_TYPE} from "./constant";
 import {primitiveValue} from "./common/types";
 import {View} from "./index";
-import {Modal, omitWrap} from "./Modal";
+import {omitWrap} from "./Modal";
 
 export interface ASTNode {
     type: typeof NODE_TYPE[keyof typeof NODE_TYPE];
@@ -44,11 +44,11 @@ function resolveStyle(dom, style: object = {}) {
     });
 }
 
-function resolveBind(dom, bind: object = {}, modal: Modal) {
-    Object.keys(bind || {}).forEach(key => {
-        dom[key] = modal.parseModal(bind[key]);
-    });
-}
+// function resolveBind(dom, bind: object = {}, modal: Modal) {
+//     Object.keys(bind || {}).forEach(key => {
+//         dom[key] = modal.parseModal(bind[key]);
+//     });
+// }
 
 
 function genHTML(this: View, VNodes): DocumentFragment {
@@ -70,7 +70,7 @@ function genHTML(this: View, VNodes): DocumentFragment {
         } else {
             if (node.type === "element") {
                 const dom = document.createElement(node.tagName);
-                resolveBind(dom, node?.config?.bind, this.$modal);
+                // resolveBind(dom, node?.config?.bind, this.$modal);
                 resolveStyle(dom, node?.config?.style);
                 if (node.children) dom.appendChild(genHTML.call(this, node.children));
                 fragment.append(dom);

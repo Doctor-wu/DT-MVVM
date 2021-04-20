@@ -96,8 +96,8 @@ export class Modal<T = object> {
     _l(expr, func) {
         const list: any[] = eval(`this._modal.${expr}`);
         const elements: any[] = [];
-        list.forEach(item => {
-            elements.push(func.call(this, item));
+        list.forEach((item, index) => {
+            elements.push(func.call(this, item, index));
         });
         return elements;
     }
@@ -114,7 +114,7 @@ export class Modal<T = object> {
 
     // 解析表达式
     _s(expr) {
-        return eval(`this.${expr} || this._modal?.${expr}`);
+        return eval(`this.${expr} === undefined ? this._modal?.${expr} : this.${expr}`);
     }
 
     d_bind(attr: ASTConfig) {
@@ -127,10 +127,10 @@ export class Modal<T = object> {
 
     parseModal(str: string) {
         if (!str) return "";
+        // @ts-ignore
         return str.replace(/\{%([^%}]+)%\}/g, (...args) => {
-            //@ts-ignore
-            const key = args[1];
-            return eval("`this._modal.${key}`")
+            // @ts-ignore
+            return eval("`this._modal.${args[1]}`")
         });
     }
 }

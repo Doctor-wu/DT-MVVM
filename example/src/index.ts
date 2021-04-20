@@ -11,7 +11,15 @@ const baseModal = new Modal({
         {
             name: 'Typescript',
             color: 'darkblue'
-        }
+        },
+        {
+            name: 'NodeJS',
+            color: 'green'
+        },
+        {
+            name: 'CSS',
+            color: 'skyblue'
+        },
     ],
     obj:{},
     myName: 'Doctorwu',
