@@ -76,7 +76,6 @@ export class Modal<T = object> {
 
     // 解析Element
     _e(eName, config: ASTConfig, children?: ASTNode[]) {
-        this.resolveDirectives(config?.directives, config, children)
         const element = {
             tagName: eName,
             type: 'element',
@@ -96,19 +95,6 @@ export class Modal<T = object> {
             attr[key] = this.parseModal(attr.bind[key]);
         })
         return attr;
-    }
-
-    resolveDirectives(directives, config: ASTConfig, children?: ASTNode[]) {
-        if (!directives) return;
-        Object.keys(directives).forEach(key => {
-            const resolver = this[`d_${key}`];
-            if (resolver == undefined) return;
-            resolver.call(this, directives[key], config, children)
-        })
-    }
-
-    d_for(options, config: ASTConfig, children?: ASTNode[]) {
-        console.log(options, config, children)
     }
 
     parseModal(str: string) {

@@ -21,7 +21,5 @@ export declare class Modal<T = object> {
         children: ASTNode[] | undefined;
     };
     _a(attr: any): any;
-    resolveDirectives(directives: any, config: ASTConfig, children?: ASTNode[]): void;
-    d_for(options: any, config: ASTConfig, children?: ASTNode[]): void;
     parseModal(str: string): string;
 }

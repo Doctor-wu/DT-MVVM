@@ -59,15 +59,18 @@ export class View {
                             children: [
                                 {
                                     type: NODE_TYPE.Text,
-                                    content: "I like read {%books[0].name%} and {% books[1].name %}",
+                                    content: "I like read {%item.name%}",
                                 }
                             ],
                             config: {
                                 directives: {
                                     for: {
                                         expr: 'books',
-                                        item: 'item',
-                                        index: 'index'
+                                        alias: 'item'
+                                    },
+                                    bind: {
+                                        expr: 'style',
+                                        value: "{%item.name%}"
                                     }
                                 }
                             },
@@ -126,5 +129,23 @@ export class View {
 
     bindModal(modal: _Modal) {
         this.$modal = modal;
+    }
+
+
+
+    resolveDirectives(node: ASTNode): string | undefined {
+        const directives = node?.config?.directives || null;
+        if (!directives) return undefined;
+        let content = "";
+        Object.keys(directives).forEach(key => {
+            const resolver = this[`d_${key}`];
+            if (resolver == undefined) return;
+            content = resolver.call(this, node, content)
+        })
+    }
+
+    d_for(node: ASTNode):string {
+        console.log(node)
+        return "";
     }
 }

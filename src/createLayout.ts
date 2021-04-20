@@ -73,6 +73,7 @@ function genHTML(this: View, VNodes): DocumentFragment {
 function genCode(this: View, nodes: ASTNode[]) {
     let content = "";
     nodes.forEach(node => {
+        if(this.resolveDirectives(node)) return;
         if (node.type === NODE_TYPE.Element) {
             content += `_e("${node.tagName}",${node.config ? `_a(${JSON.stringify(node.config)})` : null},${node.children ? genCode.call(this, node.children) : null}),`;
         }

@@ -14,4 +14,6 @@ export declare class View {
     render(modal: _Modal | primitiveValue, container: HTMLElement | string): void;
     getLayout(): ASTNode;
     bindModal(modal: _Modal): void;
+    resolveDirectives(node: ASTNode): string | undefined;
+    d_for(node: ASTNode): string;
 }
