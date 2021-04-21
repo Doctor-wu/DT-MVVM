@@ -23,12 +23,13 @@ const baseModal = new Modal({
     ],
     obj:{},
     myName: 'Doctorwu',
-    guest: 'Yoki',
+    guest: 'Yoqi',
     date: formatTime(new Date(Date.now()+8*3600000).toISOString()+8*3600000),
 });
 baseView.render(baseModal, '#app');
 
 (window as any).modal = baseModal.getModal();
+baseModal.getModal().guest = "Yoki"
 // setInterval(() => {
 //     baseModal.getModal().date = formatTime(new Date(Date.now()+8*3600000).toISOString()+8*3600000);
 // }, 1000)

@@ -22,6 +22,7 @@ const rollupConfig = {
             file: path.join(paths.output, "index.js"),
             format: "cjs",
             name: pkg.name.replace(/^([a-zA-Z])/, c => c.toUpperCase()),
+            external: [ 'core-js' ],
             sourcemap: true // es5 -> es6源码
         },
         // 输出 es 规范的代码
@@ -29,6 +30,7 @@ const rollupConfig = {
             file: path.join(paths.output, "index.umd.js"),
             format: "umd",
             name: pkg.name.replace(/^([a-zA-Z])/, c => c.toUpperCase()),
+            external: [ 'core-js' ],
             sourcemap: true // es5 -> es6源码
         },
     ],

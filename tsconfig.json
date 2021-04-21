@@ -5,8 +5,7 @@
     "target": "es5",
     "lib": [
       "dom",
-      "esnext",
-      "es6"
+      "esnext"
     ],
     "removeComments": false,
     "declaration": true,
