@@ -1,45 +1,22 @@
 {
-  "name": "mvvm",
+  "name": "vue3",
+  "private":true,
+  "workspaces": [
+    "packages/*"
+  ],
   "version": "1.0.0",
-  "description": "a frontend mvvm framework",
-  "main": "lib/index.js",
-  "module": "lib/index.umd.js",
-  "typings": "lib/index.d.js",
+  "main": "index.js",
   "scripts": {
-    "dev": "rollup -c rollup.config.ts -w ./src",
-    "test": "jest --coverage --verbose -u",
-    "lint:fix": "eslint --fix --ext .js,.ts ./src",
-    "build": "rollup build -c rollup.config.ts",
-    "prepublishOnly": "npm run lint & npm run test & npm run build",
-    "api": "api-extractor run"
+    "dev": "node scripts/dev.js",
+    "build": "node scripts/build.js"
   },
-  "author": "Doctorwu",
-  "license": "ISC",
-  "dependencies": {
-    "@babel/core": "^7.13.15",
-    "@babel/plugin-transform-runtime": "^7.13.15",
-    "@babel/preset-env": "^7.13.15",
-    "@microsoft/api-extractor": "^7.13.5",
-    "@types/fs-extra": "^9.0.11",
-    "@types/jest": "^26.0.22",
-    "@typescript-eslint/eslint-plugin": "^4.22.0",
-    "@typescript-eslint/parser": "^4.22.0",
-    "core-js": "^3.10.1",
-    "eslint": "^7.24.0",
-    "eslint-plugin-jest": "^24.3.5",
-    "jest": "^26.6.3",
-    "lint-staged": "^10.5.4",
-    "rollup": "^2.45.2",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-commonjs": "^10.1.0",
-    "rollup-plugin-eslint": "^7.0.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "rollup-plugin-typescript2": "^0.30.0",
-    "ts-jest": "^26.5.5"
-  },
+  "license": "MIT",
   "devDependencies": {
-    "conventional-changelog-cli": "^2.1.1",
-    "typescript": "^4.2.4"
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^13.0.0",
+    "execa": "^5.1.1",
+    "rollup": "^2.52.3",
+    "rollup-plugin-typescript2": "^0.30.0",
+    "typescript": "^4.3.4"
   }
 }

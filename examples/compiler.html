@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <section class="auth">
+      __router-view__
+      <ul class="left">
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+      <!-- I am A Comment -->
+      <ul class="right">
+        <li></li>
+        <li></li>
+        <li></li>
+      </ul>
+    </section>
+    <script src="../node_modules/@dt-view/compiler/dist/compiler.global.js"></script>
+    <script>
+      console.log(compiler);
+      let viewCompiler = new compiler.Compiler();
+      viewCompiler.compile(document.querySelector(".auth").outerHTML);
+      console.log(viewCompiler);
+    </script>
+  </body>
+</html>

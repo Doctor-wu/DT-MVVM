@@ -1,0 +1,15 @@
+{
+  "name": "@dt-view/compiler",
+  "version": "1.0.0",
+  "main": "index.js",
+  "module": "dist/compiler.esm-bundler.js",
+  "license": "MIT",
+  "buildOptions": {
+    "name": "compiler",
+    "formats": [
+      "cjs",
+      "esm-bundler",
+      "global"
+    ]
+  }
+}

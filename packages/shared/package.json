@@ -1,0 +1,14 @@
+{
+  "name": "@dt-view/shared",
+  "version": "1.0.0",
+  "main": "index.js",
+  "module": "dist/shared.esm-bundler.js",
+  "license": "MIT",
+  "buildOptions": {
+    "name": "ViewShared",
+    "formats": [
+      "cjs",
+      "esm-bundler"
+    ]
+  }
+}

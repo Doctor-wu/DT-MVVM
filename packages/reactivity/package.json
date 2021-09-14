@@ -1,0 +1,15 @@
+{
+  "name": "@dt-view/reactivity",
+  "version": "1.0.0",
+  "main": "index.js",
+  "module": "dist/reactivity.esm-bundler.js",
+  "license": "MIT",
+  "buildOptions": {
+    "name": "Reactivity",
+    "formats": [
+      "cjs",
+      "esm-bundler",
+      "global"
+    ]
+  }
+}

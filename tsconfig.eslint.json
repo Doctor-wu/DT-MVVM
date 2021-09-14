@@ -1,8 +1,0 @@
-/* tsconfig.eslint.json */
-{
-  "compilerOptions": {
-    "baseUrl": "./src",
-    "resolveJsonModule": true
-  },
-  "include": ["**/*.ts", "**/*.js"]
-}
