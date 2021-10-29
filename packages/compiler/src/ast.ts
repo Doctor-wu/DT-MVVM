@@ -109,8 +109,7 @@ export module AST {
       let lastIdentifier = this.identifierStack.pop();
       if (this.tokenReader.peek()?.value !== lastIdentifier) {
         throw TypeError(
-          `Unexpeted TagTail Identifier ${
-            this.tokenReader.peek()?.value
+          `Unexpeted TagTail Identifier ${this.tokenReader.peek()?.value
           } whitch is not match ${lastIdentifier}`
         );
       }
